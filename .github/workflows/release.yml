@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Build linux/amd64
+        run: GOOS=linux GOARCH=amd64 go build -o dist/sql-engine-linux-amd64 .
+
+      - name: Build darwin/arm64
+        run: GOOS=darwin GOARCH=arm64 go build -o dist/sql-engine-darwin-arm64 .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/sql-engine-linux-amd64
+            dist/sql-engine-darwin-arm64

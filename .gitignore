@@ -1,0 +1,10 @@
+# Build artifacts
+build/
+dist/
+sql-engine
+sql-engine-*
+
+# Go
+*.test
+*.out
+vendor/
