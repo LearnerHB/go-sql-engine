@@ -21,18 +21,24 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          printf '%s' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Test SSH connection
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "echo SSH_OK"
+
       - name: Upload binary
         run: |
-          rsync -e "ssh -i ~/.ssh/deploy_key" sql-engine \
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            sql-engine \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/go-sql-engine/sql-engine
 
       - name: Restart service
         run: |
-          ssh -i ~/.ssh/deploy_key \
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
               set -e
               chmod +x ~/go-sql-engine/sql-engine
