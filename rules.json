@@ -1,0 +1,56 @@
+[
+  {
+    "id": "R001",
+    "name_zh": "DELETE / UPDATE 无 WHERE 条件",
+    "name_en": "DELETE / UPDATE without WHERE clause",
+    "severity": "high",
+    "category": "dangerous_operation",
+    "description_zh": "对全表执行删除或更新操作，可能造成大量数据丢失或篡改，属于高危操作。",
+    "description_en": "Performing DELETE or UPDATE on the entire table without a WHERE clause may cause massive data loss or corruption."
+  },
+  {
+    "id": "R002",
+    "name_zh": "DROP / TRUNCATE 高危 DDL 操作",
+    "name_en": "High-risk DDL: DROP / TRUNCATE",
+    "severity": "high",
+    "category": "dangerous_operation",
+    "description_zh": "DROP 或 TRUNCATE 操作会立即清除表结构或全量数据，且通常不可回滚，属于极高风险操作。",
+    "description_en": "DROP or TRUNCATE immediately destroys table structure or all data and is typically irreversible — extremely high risk."
+  },
+  {
+    "id": "R003",
+    "name_zh": "SELECT * 全字段查询",
+    "name_en": "SELECT * full-column query",
+    "severity": "medium",
+    "category": "data_exposure",
+    "description_zh": "查询全部字段可能无意间暴露敏感列（如密码、手机号），建议明确指定所需字段。",
+    "description_en": "Querying all columns may unintentionally expose sensitive fields (e.g. passwords, phone numbers). Specify only the columns you need."
+  },
+  {
+    "id": "R004",
+    "name_zh": "大 LIMIT 查询（潜在数据泄露）",
+    "name_en": "Large LIMIT value (potential data exfiltration)",
+    "severity": "medium",
+    "category": "data_exposure",
+    "description_zh": "LIMIT 值超过 10000，短时间内大量导出数据存在数据泄露风险，应结合业务场景评估。",
+    "description_en": "A LIMIT value exceeding 10,000 rows suggests bulk data export, which may indicate data exfiltration risk."
+  },
+  {
+    "id": "R005",
+    "name_zh": "UNION 注入特征",
+    "name_en": "UNION-based injection pattern",
+    "severity": "high",
+    "category": "injection",
+    "description_zh": "检测到 UNION 联合查询，常见于 SQL 注入攻击，用于绕过权限查询额外数据。",
+    "description_en": "UNION queries are a common SQL injection technique used to extract data from additional tables by bypassing access controls."
+  },
+  {
+    "id": "R006",
+    "name_zh": "注释符注入特征",
+    "name_en": "Comment-based injection pattern",
+    "severity": "medium",
+    "category": "injection",
+    "description_zh": "检测到 SQL 注释符（-- 或 /**/），常用于注入攻击中截断原始 SQL 逻辑。",
+    "description_en": "SQL comment characters (-- or /**/) are commonly used in injection attacks to truncate the original SQL logic."
+  }
+]
