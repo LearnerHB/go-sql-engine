@@ -34,6 +34,8 @@ jobs:
 
       - name: Upload binary
         run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ~/go-sql-engine"
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             sql-engine \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/go-sql-engine/sql-engine
