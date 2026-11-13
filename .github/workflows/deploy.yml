@@ -1,53 +1,18 @@
-name: Deploy
+name: Build SQL engine
 
 on:
   push:
     branches: [main]
+  pull_request:
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
-
-      - name: Build linux/amd64 binary
-        run: GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o sql-engine .
-
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-          echo "Key type: $(ssh-keygen -l -f ~/.ssh/deploy_key 2>&1)"
-
-      - name: Test SSH connection
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            -o BatchMode=yes \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "echo SSH_OK"
-
-      - name: Upload binary
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
-            "mkdir -p /home/ec2-user/go-sql-engine && pm2 stop sql-engine 2>/dev/null || true"
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            sql-engine \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/ec2-user/go-sql-engine/sql-engine
-
-      - name: Restart service
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-              set -e
-              chmod +x /home/ec2-user/go-sql-engine/sql-engine
-              pm2 restart sql-engine 2>/dev/null || pm2 start /home/ec2-user/go-sql-engine/sql-engine --name sql-engine
-              pm2 save
-              echo ">>> sql-engine deployed."
-            '
+          go-version-file: go.mod
+          cache: true
+      - run: go test ./...
+      - run: go build ./...

@@ -54,12 +54,13 @@ func main() {
 	if port == "" {
 		port = "8081"
 	}
+	addr := os.Getenv("SQL_ENGINE_HOST") + ":" + port
 
 	http.HandleFunc("/check", handleCheck)
 	http.HandleFunc("/health", handleHealth)
 
-	log.Printf("Go SQL Engine listening on :%s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	log.Printf("Go SQL Engine listening on %s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }
